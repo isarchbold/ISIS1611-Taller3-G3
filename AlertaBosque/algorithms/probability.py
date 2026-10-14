@@ -12,9 +12,24 @@ def normalize(weights: dict) -> dict:
     - Conserve las claves y su orden; no modifique weights.
     - Rechace pesos negativos, no finitos, diccionarios vacíos y suma cero.
     """
-    # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+    if not weights:
+        raise ValueError("El diccionario está vacío")
+
+    for peso in weights.values():
+        if peso < 0 or not math.isfinite(peso):
+            raise ValueError("Peso inválido")
+
+    total = sum(weights.values())
+
+    if total == 0:
+        raise ValueError("La suma es cero")
+
+    rta = {}
+
+    for clave, peso in weights.items():
+        rta[clave] = peso / total
+
+    return rta
 
 
 def expected_utility(distribution: dict, utilities: dict) -> float:
@@ -28,7 +43,7 @@ def expected_utility(distribution: dict, utilities: dict) -> float:
     - distribution ya debe estar normalizada; no normalice utilidades.
     - Ambas tablas deben contener los mismos resultados posibles.
     """
-    # Validación de las entradas; no modificar.
+
     if set(distribution) != set(utilities) or not distribution:
         raise ValueError("Probabilidades y utilidades deben tener las mismas claves")
     if any(not math.isfinite(p) or p < 0 for p in distribution.values()):
@@ -37,9 +52,13 @@ def expected_utility(distribution: dict, utilities: dict) -> float:
         raise ValueError("La distribución debe sumar uno")
     if any(not math.isfinite(u) for u in utilities.values()):
         raise ValueError("Utilidades no finitas")
-    # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+
+    rta = 0
+
+    for estado, probabilidad in distribution.items():
+        rta += probabilidad * utilities[estado]
+
+    return rta
 
 
 def best_action(distribution: dict, actions: dict) -> tuple[str, dict]:
@@ -56,6 +75,16 @@ def best_action(distribution: dict, actions: dict) -> tuple[str, dict]:
     # Validación de las acciones; no modificar.
     if not actions:
         raise ValueError("Se requiere al menos una acción")
-    # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+    rta = {}
+    mejor_accion = None
+    mejor_utilidad = float("-inf")
+
+    for accion, utilidades in actions.items():
+        utilidad = expected_utility(distribution, utilidades)
+        rta[accion] = utilidad
+
+        if utilidad > mejor_utilidad:
+            mejor_utilidad = utilidad
+            mejor_accion = accion
+
+    return mejor_accion, rta
