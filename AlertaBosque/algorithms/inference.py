@@ -1,7 +1,7 @@
 """Punto 2. Inferencia exacta por enumeración."""
 from algorithms.probability import normalize
 
-
+#Esqueleto sacado de  Notas_de_Clase_v4 (Cap 6.4, muestra un pseudocodigo general, más no para el caso recursivo)
 def enumeration_ask(network, query: str, evidence: dict) -> dict:
     """Calcula P(query | evidence) sobre la conjunta factorizada.
 
@@ -23,7 +23,33 @@ def enumeration_ask(network, query: str, evidence: dict) -> dict:
     """
     # Valida nombres de variables y dominio de la evidencia.
     network.validate_query(query, evidence)
+    pesos = {}
+    for valor in (0, 1):
+        if query in evidence:
+            if evidence[query] != valor:
+                pesos[valor] = 0.0
+                continue
+        extended_evidence = evidence.copy()
+        extended_evidence[query] = valor
+        pesos[valor] = enumerate_all(network.variables, extended_evidence, network)
+    return normalize(pesos)
 
-    # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+def enumerate_all(variables, evidence, network):
+    """Calcula la probabilidad de un evento dado."""
+    if not variables:
+        return 1.0
+    variable = variables[0]
+    resto = variables[1:]
+    if variable in evidence:
+        return network.probability(variable, evidence[variable], evidence) * enumerate_all(resto, evidence, network)
+    else:
+        total = 0.0
+        for valor in (0, 1):
+            extended_evidence = evidence.copy()
+            extended_evidence[variable] = valor
+            total += network.probability(variable, valor, evidence) * enumerate_all(resto, extended_evidence, network)
+        return total
+        
+    
+    
     # FIN DEL BLOQUE DEL ESTUDIANTE
